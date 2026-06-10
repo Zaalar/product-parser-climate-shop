@@ -7,7 +7,7 @@ def check_results():
         
         headers = [cell.value for cell in sheet[1]]
         model_col_idx = headers.index('Модель')
-        article_col_idx = len(headers) - 1 # should be the last one "Артикул"
+        article_col_idx = len(headers) - 1
         if headers[-1] != 'Артикул':
             print("Warning: Last column not named Артикул")
             

@@ -15,28 +15,21 @@ async def process_model(model_name, context, sem, row_idx, results):
     async with sem:
         print(f"[{row_idx}] Processing: {model_name}")
         clean_model = str(model_name).strip()
-        clean_model = re.sub(r'\(.*?\)', '', clean_model) # remove text in parentheses
+        clean_model = re.sub(r'\(.*?\)', '', clean_model)
         if '/' in clean_model:
-            clean_model = clean_model.split('/')[0] # take first part before slash
+            clean_model = clean_model.split('/')[0]
         clean_model = clean_model.strip()
         
         search_url = f"{BASE_URL}/catalog/?q={urllib.parse.quote(clean_model)}"
-        
-        # Adding a random delay to simulate a human and bypass DDoS protection
         await asyncio.sleep(random.uniform(3.0, 7.0))
         
         page = await context.new_page()
         try:
-            # Go to search page
             await page.goto(search_url, wait_until="domcontentloaded", timeout=20000)
-            
-            # Wait for search results or something to load
             try:
                 await page.wait_for_selector(".catalog-block-view__item, .catalog-block__item, .list-item", timeout=5000)
             except Exception:
-                pass # Proceed anyway
-                
-            # Find the actual product link
+                pass
             product_link = None
             locators = [".catalog-block-view__item a", ".catalog-block__item a", ".list-item a"]
             for loc in locators:
@@ -55,17 +48,13 @@ async def process_model(model_name, context, sem, row_idx, results):
                 return
                 
             print(f"[{row_idx}] Found link: {product_link}")
-            
-            # Navigate to product page
             response = await page.goto(product_link, wait_until="domcontentloaded", timeout=20000)
             if response is None or response.status == 404:
                 results[row_idx] = "Товар не найден (404)"
                 print(f"[{row_idx}] 404 for {product_link}")
                 return
                 
-            await page.wait_for_timeout(1500) # give JS time to populate article span
-            
-            # Extract article
+            await page.wait_for_timeout(1500)
             try:
                 article = await page.locator(".js-replace-article").get_attribute("data-value", timeout=3000)
                 if article:
@@ -74,8 +63,6 @@ async def process_model(model_name, context, sem, row_idx, results):
                     return
             except Exception:
                 pass
-                
-            # Alternative locations
             try:
                 sku_meta = await page.locator("meta[itemprop='sku']").get_attribute("content", timeout=1000)
                 if sku_meta:
@@ -84,8 +71,6 @@ async def process_model(model_name, context, sem, row_idx, results):
                     return
             except Exception:
                 pass
-                
-            # Last resort: visual article block
             try:
                 art_text = await page.locator(".article .value").inner_text(timeout=1000)
                 if art_text:
@@ -136,7 +121,6 @@ async def main():
     
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
-        # Setup context with user agent to bypass simple blocks
         context = await browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
             viewport={"width": 1280, "height": 800}

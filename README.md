@@ -1,31 +1,23 @@
-# Product Parser: Climate Shop
+# Product Parser Climate Shop
 
-Python parser demo for product data enrichment from an online catalog.
+Парсер для обработки товарных данных из интернет-каталога.
 
-## What it does
+## Что делает
 
-- Reads product model names from an Excel file.
-- Opens search pages with Playwright.
-- Finds matching product pages.
-- Extracts product article/SKU data.
-- Writes enriched results back to Excel.
+- берет названия моделей из Excel-файла;
+- открывает поиск по каталогу;
+- находит страницу подходящего товара;
+- достает артикул;
+- записывает результат обратно в Excel.
 
-## Stack
+## Стек
 
 - Python
 - asyncio
 - Playwright
 - openpyxl
 
-## My role
-
-Built the parsing flow, search navigation, product page extraction, retry-style checks and Excel result generation.
-
-## Why this is relevant
-
-This project is close to content/data roles: it combines website analysis, browser automation, product matching, Excel processing and data quality checks.
-
-## Run
+## Как запустить
 
 ```bash
 pip install -r requirements.txt
@@ -33,12 +25,8 @@ playwright install
 python parser.py
 ```
 
-The demo includes `sample_input.xlsx` as an example input file.
+В репозитории есть `sample_input.xlsx` как пример входного файла.
 
-## What I would improve
+## Что показывает проект
 
-- Add structured logging.
-- Move settings to `.env`.
-- Add CLI arguments for input/output files.
-- Add stronger duplicate and empty-field checks.
-- Add scheduled execution through cron or Windows Task Scheduler.
+Проект показывает работу с браузерной автоматизацией, поиском по каталогу, извлечением товарных данных и записью результата в Excel.
